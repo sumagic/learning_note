@@ -18,6 +18,7 @@
 
 ### cyber RT学习
 * [apollo cyber rt操作系统学习记录](https://blog.csdn.net/jinfagang1211/article/details/87198285)
+<img src="../data/img/cyberrt-architecture.png">cyberrt架构</img>
 * cyberRT最底层的是一些apollo内部使用的库，为了减少依赖，提高整个系统的效率，许多轮子自己造。比如他们自己实现的高效率的FreeList对象回收池；
 * 再往上是通信相关的，包括服务发现，publish-subscribe通信机制。CyberRT也支持跨进程、跨机器通信，上层业务逻辑无需关心，通信层会根据算法模块的部署，自动选择相应通信机制
 * 通信层之上是数据缓存/融合层，多路传感器之间数据需要融合，而且算法可能需要缓存一定的数据。数据层起到了这个模块间通信桥梁的作用。
@@ -28,4 +29,12 @@
 
 ### cyberrt源码分析
 * cyberrt的实现是模块化的，重要的就是component和croutine两个模块，后者是自己实现的一个高性能的协程库，为整个系统提供协程的调用。
+
+##### ros存在哪些问题
+* 烦人的master，由于master的存在，导致每次的ros工程都要启动master节点，一旦master挂机了，其他节点都GG;
+* ros内部没有调度，完全依赖于操作系统，所以进程之间没有优先性，这回导致一些重要的节点有时候会由于其他非重要节点的抢占而卡顿，二有时候他们的卡顿是致命的。
+* cyber是框架，也就是调度的东西，所有的节点都变成了modules，也就是模块
+
+## cyberrt架构
+* [cyberrt架构](https://blog.csdn.net/qq_25762163/article/details/103591766)
 * 

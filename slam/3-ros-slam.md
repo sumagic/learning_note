@@ -77,6 +77,31 @@
 
 * acml包研究完了，下面就是规划。规划的基础是地图，所以要先研究costmap_2d这个包
 
-### ros navogation软件包的使用
+### [navigation stack](https://www.jianshu.com/p/85faa82309b4)
 
-* 
+* navigation stack是一个ROS的metapackage
+* 里面包含了ROS在路径规划，定位，地图，异常行为恢复等方面的package，
+* 主要作用就是路径规划，输入各传感器的数据，输出速度
+* 一般我们的ros都预装了navigation
+
+* amcl, 定位
+* fake_loalization, 定位
+* map_server, 提供地图
+* move_base, 路径规划节点
+* nav_core, 路径规划的接口类
+* base_local_planner, 实现了多个局部路径规划算法
+* dwa_local_planner,重新实现了dwa局部规划算法
+* parrot_planner, 实现了较为简单的全局规划算法
+* navfn, 全局规划算法
+* global_planner, 实现了某些全局规划算法
+* clear_costmap_recovery，实现了清除代价地图的恢复行为
+* rotate_recovery, 实现了旋转的恢复行为
+* move_slow_and_clear, 实现了缓慢移动的恢复行为
+* costmap_2d, 二维代价地图
+* voxel_grid, 三维小方块
+* rebot_poase_ekf, 机器人位姿的卡尔满滤波器
+
+### [TF](https://zhuanlan.zhihu.com/p/28288871)
+
+* TF是ROS核心库之一，它记录了所有frame的变换关系
+* TF使用起来非常简单，核心函数就有两个，一个broadcast，把坐标变换关系发布出去，一个listener监听所有的broadcast，建立好坐标变换树方便调用

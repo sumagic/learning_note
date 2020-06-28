@@ -52,6 +52,7 @@
 * 读取数据： cv::FileStorage::READ
 * fp.release()
 * fp.isOpened()
+* std::thread* pointer, 在主线程内跟踪线程
 
 ### load ORB Vocabulary
 

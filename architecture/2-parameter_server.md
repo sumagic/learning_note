@@ -17,4 +17,6 @@
 
 * mashout基于hadoop，MIL基于spark，都是采用iterative mapreduce。采用同步迭代的通信方式，使得他们很容易因为个别机器的地性能导致全局性能的降低
 
+## scaling distributed machind learning， Limu
+
 * 

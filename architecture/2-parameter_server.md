@@ -38,5 +38,7 @@
 * 参数服务器在开始学习前，会把大规模的训练数据拆分到每个计算节点上。单个计算节点就对本地数据进行学习就可以了。学习完毕之后再把参数的更新梯度上传给对应的参数服务节点进行更新
 
 * 计算节点(worker)和参数服务节点(parameter server)
+=======
+## scaling distributed machind learning， Limu
 
 * 

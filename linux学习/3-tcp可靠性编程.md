@@ -131,4 +131,78 @@
 * 当客户端接收到服务器发来的SYN+ACK报文后，就会回复ACK给服务器，同时客户端连接状态从SYN_SENT转换为ESTABLISHED，表示连接建立成功
 * 当网络繁忙，不稳定时，报文丢失就会变得很严重，此时应该调大重发次数，反之则可以调小重发次数。修改重发次数的方法是，调整tcp_synack_retries参数
 * 服务器接收到ACK后连接建立成功，此时内核会把连接从半连接队列移除，然后建立新的完全的连接，并将其添加到accept队列，等待进程调用accept函数时把连接取出来
-* 如果进程不能及时地调用accept函数，就会造成accept队列()
+* 如果进程不能及时地调用accept函数，就会造成accept队列(也成为全连接队列)溢出，最终导致建立好的TCP连接被丢弃
+
+###### accept队列已满，只能丢弃连接么
+
+* 丢弃连接只是linux的默认行为，我们还可以选择向客户端发送RST复位报文，告诉客户端连接已经建立失败。打开这一功能需要将tcp_abort_on_overflow参数设置为1
+    * 0，如果accept队列满了，那么server扔掉client发过来的ack
+    * 1，如果accept队列满了，server发送一个RST包给client,表示废掉这个握手过程和这个连接
+
+* 通常应该把这个参数设置为0，这样更有利于应对突发流量
+
+<img src="../img/tcp_param_set_to_0.jpg" >
+
+###### 如何调整accept队列的长度
+
+* accept队列的长度取决于somaxconn和backlog之间的最小值，也就是min(somaxconn, backlog)
+
+* 如何查看服务端进程accept队列的长度
+```bash
+    ss -ltn
+```
+* Recv-Q: 当前accept队列的大小，也就是当前已经完成三次握手并等待服务端accept()的TCP连接
+
+* Send-Q: accept队列最大长度，上面的输出结果说明监听8088端口的TCP服务，accept队列的最大长度是128
+
+###### 如何查看由于accept连接队列已满，而被丢弃的连接
+```bash
+    netstat -s | grep overflowed
+```
+
+##### 如何绕过三次握手
+
+* 三次握手建立连接造成的后果就是，HTTP请求必须在一个RTT(从客户端到服务器一个往返的时间)后才能发送
+
+* 在linux 3.7内核版本之后，提供了tcp fast open功能，这个功能可以减少TCP连接建立的时延
+
+### TCP FAST OPEN功能的工作方式及客户端首次建立连接时的过程
+<img src="../img/tcp_fast_open.jpg" />
+
+* 客户端发送SYN报文，该报文包含Fast Open选项，且该选项的cookie为空，这表明客户端请求Fast open cookie
+
+* 支持TCP FAST OPEN的服务器生成cookie，并将其置于SYN-ACK数据包中的Fast open选项以发回客户端
+
+* 客户端收到SYN-ACK后，本地缓存fast open选项中的cookie
+* 所以第一次发起HTTP GET请求的时候，还是需要正常的三次握手流程，但是之后如果客户端再次向服务器建立连接时的过程
+
+* 客户端发送SYN报文，该报文包含数据(对于非TFO的普通TCP握手过程，SYN报文中不包含数据)以及此前记录的cookie
+
+* 支持TCP Fast Open的服务器会对受到cookie进行校验，如果cookie有效，服务器将在SYN-ACK报文中对SYN和数据进行确认，服务器随后将数据递送至相应的应用程序。如果cookie无效，服务器将丢弃SYN报文中包含的数据，且其随后发出的SYN-ACK报文将只确认SYN的对应序列号
+
+* 如果服务器接受了SYN报文中的数据，服务器可以在握手完成之前发送数据，这样就减少了握手带来的1个RRT的时间消耗
+
+* 客户端将发送ACK确认服务器发回的SYN以及数据，但是如果客户端在初始的SYN报文中发送的数据没有被确认，则客户端将重新发送数据
+
+* 此后的TCP连接的数据传输过程和非TFO的正常情况一致
+
+* 客户端在请求并存储了fast open cookie之后，可以不断重复TCP FAST OPEN直至服务器认为cookie无效，通常为过期
+
+* 在linux系统中，可以通过设置tcp_fastopn内核参数，来打开fast open功能
+```bash
+    echo 3 > /proc/sys/net/ipv4/tcp_fastopen
+```
+
+* 0 关闭；1 作为客户端使用fast open功能； 2 作为服务端使用fast open功能；3 无论作为客户端还是服务端，都可以使用fast open功能
+
+* tcp fast open功能需要客户端和服务端同时支持，才有效果
+
+
+## 四次挥手的性能提升
+
+* 客户端和服务端双方都可以主动断开连接，通常先关闭的一方称为主动方，后关闭连接的一方称为被动方
+<img src="../img/4ops_before_close.jpg">
+
+* 四次挥手过程只涉及了两种报文，分别时FIN和ACK
+
+* 

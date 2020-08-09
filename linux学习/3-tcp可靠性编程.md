@@ -1,5 +1,7 @@
 ## TCP可靠地关闭
 
+[LINK](https://zhuanlan.zhihu.com/p/146752547)
+
 * 保证数据传输完整性
 * 对于数据发送方: send()+shutwown(WR)+read()->0+close
 * 对于数据接收方： read()->0 + if nothing more to send + close()
@@ -205,4 +207,10 @@
 
 * 四次挥手过程只涉及了两种报文，分别时FIN和ACK
 
-* 
+* FIN就是结束连接的意思，谁发出FIN报文，就表示它将不会再发送任何数据，关闭这一方向上的传输通道
+* ACK就是确认的意思，用来通知对方，你方的发送通道已经关闭
+
+##### 四次挥手的过程
+
+* 当主动方关闭连接时，会发送FIN报文，此时发送方的TCP连接将从ESTABLISHED变成FIN_WAIT1
+* 当被动方收到FIN

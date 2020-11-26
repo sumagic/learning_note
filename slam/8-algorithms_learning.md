@@ -1,5 +1,7 @@
 # algorithms learning
 
+# VO, visual odometry
+
 ## RANSAC
 
 * 随机抽样一致
@@ -12,6 +14,10 @@
 ## BA
 
 * bundle adjustment
+
+
+### slding window bundle adjustment
+
 * 
 
 ## image registration
@@ -28,4 +34,21 @@
 * 首先进行特征检测，接下来对待配准图像进行对比，紧接着变换模型，最后实现把两幅图像的相同的部分提取实现配准
 * 主要原则是根据图像的不同处理方法来区别图像配准，可以通过频域和时域进行配准
 * 常用的方法，表面分析法，非线性变换法，取点法，矩阵法，主轴法，最大互信息法，曲线法，流体力学模型法，相关相位法，光流场模型法等
+
+
+## 如何解决随着里程的增加产生的轨迹递增的问题
+
+* 使用windows bundle adjustment
+* 融合多传感器，比如GPS，IMU等
+
+## full convariance kalman
+
+## 刚体的旋转矩阵和平移运动
+
+* vo的目的是实现路径的计算，摄像头作为一个agent，attached到实际的rover物体上，因此该物体的轨迹就是实际的路径简化
+* vo的计算方法是计算前后帧的变换矩阵T，然后将所有的变换矩阵concat到一起。初始位置和姿态可以随意取，最后的位置和姿态综合以上即有一个确定的值
+* 变换矩阵T的计算有两种方法，一种是appearance-based method，另一种是feature-basedmethod
+* 前者计算量大而且不准确；后者计算量小准确
+
+* feature matching 和feature tracking是不同的内容，要学会区分
 * 

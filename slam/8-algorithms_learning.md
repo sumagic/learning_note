@@ -51,4 +51,20 @@
 * 前者计算量大而且不准确；后者计算量小准确
 
 * feature matching 和feature tracking是不同的内容，要学会区分
-* 
+
+
+### 数学计算
+
+* 3D-2D的投影方程
+
+## 摄像头标定
+
+* checkboard-like pattern
+
+
+## 图优化
+
+## 多视图几何
+
+## 相机标定
+

@@ -70,4 +70,4 @@
 ##### class pcl::Grabber
 
 * 为PCL1.x对应的设备驱动接口的基类定义
-* 
+
